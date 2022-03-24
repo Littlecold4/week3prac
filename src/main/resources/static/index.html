@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="css/boot.css">
+
+    <style>
+        .midbox {
+            margin-top: 50px;
+            height: 400px;
+            width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: #78c2ad;
+            border-radius: 30px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .midbox > p {
+            font-size: 30px;
+            font-weight: bolder;
+            color: white;
+        }
+
+        .midbox #midsearch {
+            width: 70%;
+            float: left;
+        }
+
+        .midbtn {
+            width: 25%;
+        }
+
+        .pic {
+            height: 80%;
+            width: 80%;
+            align-self: center;
+        }
+
+        .bot {
+            bottom: 0;
+            height: 100px;
+            width:100%;
+            background-color: #78c2ad;
+            position: absolute;
+        }
+        .card{
+            height: 300px;
+            margin:15px;
+        }
+        .post{
+            position: absolute;
+            margin-left: 5px;
+            bottom:5px;
+            float: left;
+        }
+        .post2{
+            position: absolute;
+            margin-left : 80px;
+            bottom:5px;
+            float: left;
+        }
+        .midboxwrap{
+            height : 1000px;
+            width: 100%;
+        }
+        #backbtn{
+            right: 10px;
+            bottom: 10px;
+            font-weight: bolder;
+            outline-width: 3px;
+        }
+
+    </style>
+
+    <script>
+
+        $(document).ready(function () {
+            // HTML 문서를 로드할 때마다 실행합니다.
+            $('#backbtn').hide();
+        })
+
+        function back(){
+            $('#backbtn').hide();
+            window.location.reload();
+        }
+        function post(town){
+            let data = {"title":town.title,"link":town.link,"address":town.address,"raddress":town.raddress,"category":town.category};
+            $.ajax({
+                type: "POST",
+                url: "/api/city",
+                contentType: "applicaiton/json",
+                data : JSON.stringify(data),
+                success: function(response){
+                    alert("즐겨찾기에 등록되었습니다");
+                }
+            })
+        }
+        function getItems() {
+            tname = $('#midsearch').val();
+            $('#midbox').empty();
+            $.ajax({
+                type: 'GET',
+                url: `api/search?query=${tname}`,
+                success: function (response) {
+                    console.log(response)
+                    for (let i = 0; i < response.length; i++) {
+                        let town = response[i];
+                        let title = town.title;
+                        let address = town.address;
+                        let raddress = town.raddress;
+                        let category = town.category;
+                        let link = town.link;
+                        console.log(link);
+                        console.log(title, address, raddress, category, link);
+                        let temp_html = `<div class="card border-primary mb-3" style="max-width: 20rem; float:left;cursor: pointer">
+                                          <div class="card-header">${category}</div>
+                                          <div class="card-body">
+                                            <h4 class="card-title">${title}</h4>
+                                            <p class="card-text"> address : ${address}</p>
+                                            <p class="card-text"> roadadress : ${raddress}</p>
+                                           <button type="button" class="btn btn-primary post" id="post" onclick="post(${town})">save</button>
+                                           <button type="button" class="btn btn-primary post2" id="post" onclick="window.open('${link}')">go</button>
+                                          </div>
+                                        </div>`
+                        $('#midbox').append(temp_html);
+                        $('#backbtn').show();
+                    }
+                }
+            })
+        }
+    </script>
+    <script src="../../../../../sparta/spring/week04/src/main/resources/static/basic.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" style="height: 100px">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#" style="font-size: 80px; font-weight: bolder">MY TOWN</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01"
+                aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+<diu id="midbox" class="midboxwrap">
+    <div class="midbox">
+        <p>Search My Town</p>
+        <input class="form-control me-sm-2" id="midsearch" type="text" placeholder="Search">
+        <button class="btn btn-secondary my-2 my-sm-0 midbtn" type="submit" onclick="getItems()">Search</button>
+        <img src="image/town.png" class="pic">
+    </div>
+</diu>
+<div class="bot">
+    <button type="button" id="backbtn" onclick="back()" class="btn btn-outline-dark">Back</button>
+</div>
+</body>
+</html>
